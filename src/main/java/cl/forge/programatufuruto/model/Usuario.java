@@ -11,6 +11,14 @@ public class Usuario {
     private Date ultimo_login;
     private Rol id_rol;
 
+    public Usuario(int id_usuario, String nombre_usuario, String email, String password, Date ultimo_login, Rol id_rol) {
+        this.id_usuario = 0;
+        this.nombre_usuario = nombre_usuario;
+        this.email = email;
+        this.password = password;
+        this.ultimo_login = ultimo_login;
+        this.id_rol = id_rol;
+    }
 
     public Usuario() {
         this.id_usuario = 0;
@@ -20,14 +28,7 @@ public class Usuario {
         this.ultimo_login = null;
         this.id_rol = null;
     }
-    public Usuario(int id_usuario, String nombre_usuario, String email, String password, Date ultimo_login, Rol id_rol) {
-        this.id_usuario = id_usuario;
-        this.nombre_usuario = nombre_usuario;
-        this.email = email;
-        this.password = password;
-        this.ultimo_login = ultimo_login;
-        this.id_rol = id_rol;
-    }
+
 
     public int getId_usuario() {
         return id_usuario;
@@ -75,5 +76,17 @@ public class Usuario {
 
     public void setId_rol(Rol id_rol) {
         this.id_rol = id_rol;
+    }
+
+    @Override
+    public String toString(){
+
+        return this.id_usuario+ " - " +
+                this.nombre_usuario + " - " +
+                this.password + " - " +
+                this.email + " - " +
+                this.ultimo_login + " - "+
+                this.id_rol;
+
     }
 }

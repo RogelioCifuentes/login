@@ -20,9 +20,9 @@ import java.security.NoSuchAlgorithmException;
 
 public class UsuarioDAO {
 
-    PreparedStatement psInsertar;
-    Statement statement;
-    Conexion conexion;
+    private PreparedStatement psInsertar;
+    private Statement statement;
+    private Conexion conexion;
 
     public String encriptar(String cadena) throws NoSuchAlgorithmException{
 
@@ -58,9 +58,9 @@ public class UsuarioDAO {
     public void guardarUsuario(Usuario u) throws CorreoEnUsoException, UsuarioExistenteException, SQLException {
         try {
             //conexion.getConexion().createStatement();
-            psInsertar = conexion.getConexion().prepareStatement("INSERT INTO usuarios(id_usuario,nombre_usuario,email,password,ultimo_login,id_rol) VALUES (?,?,?,?,?,?");
+            psInsertar = conexion.getConexion().prepareStatement("INSERT INTO usuarios(nombre_usuario,email,password,ultimo_login,id_rol) VALUES(?,?,?,?,?)");
             psInsertar.setString(1,u.getNombre_usuario());
-
+            psInsertar.setString(2,u.getEmail());
             try {
                 //VERIFICAR SI NOMBRE EXISTE, SI NO, SETEARLO
                 if (existeUsuario(u)) {
@@ -68,10 +68,11 @@ public class UsuarioDAO {
                 }else if(existeUsuarioPorEmail(u)) {
                     throw new CorreoEnUsoException("Email ya utilizado");             //LLAMA AL METODO existeUsuariPorEmail, que verifica en la DB si el email ya esta en uso.
                 }else{
-                    psInsertar.setString(3,u.getEmail());
-                    psInsertar.setString(4,encriptar(u.getPassword()));   //Se ingresa contraseña encriptada
-                    psInsertar.setDate(5, new java.sql.Date(u.getUltimo_login().getTime()));    //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
-                    psInsertar.setObject(6,u.getId_rol());
+
+                    psInsertar.setString(3,encriptar(u.getPassword()));   //Se ingresa contraseña encriptada
+                    psInsertar.setDate(4, new java.sql.Date(u.getUltimo_login().getTime()));    //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
+                    psInsertar.setObject(5,u.getId_rol());
+                    psInsertar.executeUpdate();
                 }
             }catch(SQLException ex){
                 ex.printStackTrace();

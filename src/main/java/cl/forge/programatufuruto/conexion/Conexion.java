@@ -12,7 +12,7 @@ public class Conexion {
 
     private static final String usuario = "root";
 
-    private static final String password = "1234";
+    private static final String password = "hola1234";
 
     private static final String url = "jdbc:mysql://localhost:3306/login";
 
