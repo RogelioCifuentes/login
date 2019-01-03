@@ -55,32 +55,35 @@ public class UsuarioDAO {
         return rs.next();
     }
 
-    public void guardarUsuario(Usuario u) throws CorreoEnUsoException, UsuarioExistenteException, SQLException {
+    public void guardarUsuario(Usuario u) throws CorreoEnUsoException, UsuarioExistenteException, SQLException{
         try {
-            //conexion.getConexion().createStatement();
-            psInsertar = conexion.getConexion().prepareStatement("INSERT INTO usuarios(nombre_usuario,email,password,ultimo_login,id_rol) VALUES(?,?,?,?,?)");
-            psInsertar.setString(1,u.getNombre_usuario());
-            psInsertar.setString(2,u.getEmail());
-            try {
-                //VERIFICAR SI NOMBRE EXISTE, SI NO, SETEARLO
-                if (existeUsuario(u)) {
-                    throw new UsuarioExistenteException("Usuario ya existe");          //LLAMA AL METODO existeUsuario, que verifica en la DB si el nombre ya esta en uso.
-                }else if(existeUsuarioPorEmail(u)) {
-                    throw new CorreoEnUsoException("Email ya utilizado");             //LLAMA AL METODO existeUsuariPorEmail, que verifica en la DB si el email ya esta en uso.
-                }else{
+            final String SQL = "INSERT INTO usuarios(id_usuario,nombre_usuario,email,password,ultimo_login,id_rol) VALUES (?,?,?,?,?,?)";
+            psInsertar = conexion.getConexion().prepareStatement(SQL);
+            psInsertar.setInt(1, u.getId_usuario());
+            psInsertar.setString(2, u.getNombre_usuario());
+            psInsertar.setString(3, u.getEmail());
 
-                    psInsertar.setString(3,encriptar(u.getPassword()));   //Se ingresa contraseña encriptada
-                    psInsertar.setDate(4, new java.sql.Date(u.getUltimo_login().getTime()));    //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
-                    psInsertar.setObject(5,u.getId_rol());
-                    psInsertar.executeUpdate();
-                }
-            }catch(SQLException ex){
-                ex.printStackTrace();
+            //VERIFICAR SI NOMBRE EXISTE, SI NO, SETEARLO
+            if (existeUsuario(u)) {
+                throw new UsuarioExistenteException("Usuario ya existe");          //LLAMA AL METODO existeUsuario, que verifica en la DB si el nombre ya esta en uso.
+            } else if (existeUsuarioPorEmail(u)) {
+                throw new CorreoEnUsoException("Email ya utilizado");             //LLAMA AL METODO existeUsuariPorEmail, que verifica en la DB si el email ya esta en uso.
+            } else {
+
+                psInsertar.setString(4, encriptar(u.getPassword()));   //Se ingresa contraseña encriptada
+                psInsertar.setDate(5, new java.sql.Date(u.getUltimo_login().getTime()));    //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
+                psInsertar.setObject(6, u.getId_rol());
+                psInsertar.executeUpdate();
             }
-        }catch(NoSuchAlgorithmException ex){
-            ex.printStackTrace();
+
+        }catch(SQLException ex){
+                ex.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
+
     }
+
 
     //ACTUALIZA FECHA EN LA BASE DE DATOS
     public void actualizarFecha(Usuario usuario) throws SQLException{
@@ -130,7 +133,7 @@ public class UsuarioDAO {
             usuario.setEmail(rs.getString(3));
             usuario.setPassword(rs.getString(4));
             usuario.setUltimo_login(rs.getDate(5));
-            usuario.setId_rol((Rol) rs.getObject(6));
+            usuario.setId_rol(rs.getInt(6));
             usuarios.add(usuario);
         }
         return usuarios;
@@ -150,7 +153,7 @@ public class UsuarioDAO {
             usuario.setEmail(rs.getString(3));
             usuario.setPassword(rs.getString(4));
             usuario.setUltimo_login(rs.getDate(5));
-            usuario.setId_rol((Rol)rs.getObject(6));
+            usuario.setId_rol(rs.getInt(6));
         }
         return usuario;
     }
@@ -169,7 +172,7 @@ public class UsuarioDAO {
             usuario.setEmail(rs.getString(3));
             usuario.setPassword(rs.getString(4));
             usuario.setUltimo_login(rs.getDate(5));
-            usuario.setId_rol((Rol)rs.getObject(6));
+            usuario.setId_rol(rs.getInt(6));
         }
         return usuario;
     }

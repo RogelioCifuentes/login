@@ -9,10 +9,10 @@ public class Usuario {
     private String email;
     private String password;
     private Date ultimo_login;
-    private Rol id_rol;
+    private int id_rol;
 
-    public Usuario(int id_usuario, String nombre_usuario, String email, String password, Date ultimo_login, Rol id_rol) {
-        this.id_usuario = 0;
+    public Usuario(int id_usuario, String nombre_usuario, String email, String password, Date ultimo_login, int id_rol) {
+        this.id_usuario = id_usuario;
         this.nombre_usuario = nombre_usuario;
         this.email = email;
         this.password = password;
@@ -21,12 +21,12 @@ public class Usuario {
     }
 
     public Usuario() {
-        this.id_usuario = 0;
+        this.id_usuario = 55;
         this.nombre_usuario = "";
         this.email = "";
         this.password = "";
         this.ultimo_login = null;
-        this.id_rol = null;
+        this.id_rol = 3;
     }
 
 
@@ -70,11 +70,11 @@ public class Usuario {
         this.ultimo_login = ultimo_login;
     }
 
-    public Rol getId_rol() {
+    public int getId_rol() {
         return id_rol;
     }
 
-    public void setId_rol(Rol id_rol) {
+    public void setId_rol(int id_rol) {
         this.id_rol = id_rol;
     }
 

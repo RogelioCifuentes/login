@@ -24,8 +24,8 @@ public class ProgramaBuscarUsuarios {
     }
 
     public static void imprimirUsuarios(ArrayList<Usuario> usuarios){
-        for(Usuario lista : usuarios){
-            System.out.println(lista);
+        for(Usuario usuario : usuarios){
+            System.out.println(usuario);
         }
     }
 }
