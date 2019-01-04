@@ -13,8 +13,8 @@ public class Usuario {
     private String ultimo_login;
     private Rol id_rol;
 
-    public Usuario(int id_usuario, String nombre_usuario, String email, String password, Rol id_rol) {
-        this.id_usuario = id_usuario;
+    public Usuario(String nombre_usuario, String email, String password, Rol id_rol) {
+        this.id_usuario = 0;
         this.nombre_usuario = nombre_usuario;
         this.email = email;
         this.password = password;

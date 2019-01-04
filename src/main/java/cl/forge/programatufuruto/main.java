@@ -24,29 +24,12 @@ public class main {
         Statement statement;
 
 
-        System.out.println("hello world");
-        Conexion conexion = new Conexion();
-        conexion.getConexion();
+        Rol rol1 = new Rol(1, "Admin", "Administra");
+        Rol rol2 = new Rol(2, "Moderador", "Modera");
+        Rol rol3 = new Rol(3, "Usuario", "Se registra y navega");
 
-        Rol rol = new Rol(23, "Admin33", "admin333333istra");
 
-        //SE INGRESA AL PRIMER INTENTO UN ROL
-/*
-        String SQL = "INSERT INTO roles(id_rol,nombre,descripcion) VALUES(?,?,?)";
-        psInsertar = conexion.getConexion().prepareStatement(SQL);
-        psInsertar.setInt(1,rol.getId_rol());
-        psInsertar.setString(2,rol.getNombre());
-        psInsertar.setString(3,rol.getDescripcion());
-        psInsertar.executeUpdate();
-
-        LocalDate login = LocalDate.now();
-        String login2 = LocalDateTime.now().toString();
-        System.out.println(login2);
-
-        System.out.println(login);
-        */
-
-        Usuario usuario = new Usuario(57,"qesad", "hla@gmail.com", "1234",rol);
+        Usuario usuario = new Usuario("JUn lopezz", "asdadasd@gatito.zorrito", "1asd234",rol3);
         UsuarioDAO dao = new UsuarioDAO();
 
         try {

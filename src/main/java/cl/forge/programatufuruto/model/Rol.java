@@ -13,6 +13,12 @@ public class Rol {
         this.descripcion = "";
     }
 
+    public Rol(int id_rol) {
+        this.id_rol = id_rol;
+        this.nombre = "";
+        this.descripcion = "";
+    }
+
     public Rol(int id_rol, String nombre, String descripcion) {
         this.id_rol = id_rol;
         this.nombre = nombre;

@@ -69,7 +69,6 @@ public class UsuarioDAO {
 
     public boolean existeUsuario( Usuario usuario ) throws SQLException {
         //BUSQUEDA DE NOMBRE EN BASE DE DATOS
-        System.out.println("Error ");
         psInsertar = conexion.getConexion().prepareStatement("SELECT nombre_usuario FROM usuarios WHERE nombre_usuario=?");
         psInsertar.setString(1, usuario.getNombre_usuario());
         ResultSet rs = psInsertar.executeQuery();
@@ -94,15 +93,16 @@ public class UsuarioDAO {
         } else {
 
 
-                final String SQL = "INSERT INTO usuarios(id_usuario,nombre_usuario,email,password,ultimo_login,id_rol) VALUES (?,?,?,?,?,?)";
+                final String SQL = "INSERT INTO usuarios(nombre_usuario,email,password,ultimo_login,id_rol) VALUES (?,?,?,?,?)";
                 psInsertar = conexion.getConexion().prepareStatement(SQL);
-                psInsertar.setInt(1, u.getId_usuario());
-                psInsertar.setString(2, u.getNombre_usuario());
-                psInsertar.setString(3, u.getEmail());
-                psInsertar.setString(4, encriptar(u.getPassword()));   //Se ingresa contraseña encriptada
-                psInsertar.setString(5, u.getUltimo_login());    //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
-                psInsertar.setInt(6, u.getId_rol().getId_rol());
+
+                psInsertar.setString(1, u.getNombre_usuario());
+                psInsertar.setString(2, u.getEmail());
+                psInsertar.setString(3, encriptar(u.getPassword()));   //Se ingresa contraseña encriptada
+                psInsertar.setString(4, u.getUltimo_login());    //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
+                psInsertar.setInt(5, u.getId_rol().getId_rol());
                 psInsertar.executeUpdate();
+                System.out.println("Usuario ingresado correctamente");
         }
 
         } catch (SQLException ex) {
@@ -161,7 +161,7 @@ public class UsuarioDAO {
             usuario.setEmail(rs.getString(3));
             usuario.setPassword(rs.getString(4));
             usuario.setUltimo_login(rs.getString(5));
-            usuario.setId_rol((Rol)rs.getObject(6));
+            usuario.setId_rol( new Rol(rs.getInt(6)) );
             usuarios.add(usuario);
         }
         return usuarios;
