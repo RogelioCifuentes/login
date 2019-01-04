@@ -1,5 +1,7 @@
 package cl.forge.programatufuruto.model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class Usuario {
@@ -8,15 +10,19 @@ public class Usuario {
     private String nombre_usuario;
     private String email;
     private String password;
-    private Date ultimo_login;
-    private int id_rol;
+    private String ultimo_login;
+    private Rol id_rol;
 
-    public Usuario(int id_usuario, String nombre_usuario, String email, String password, Date ultimo_login, int id_rol) {
+    public Usuario(int id_usuario, String nombre_usuario, String email, String password, Rol id_rol) {
         this.id_usuario = id_usuario;
         this.nombre_usuario = nombre_usuario;
         this.email = email;
         this.password = password;
-        this.ultimo_login = ultimo_login;
+
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("YYYY-MM-DD HH:MM:ss");
+        LocalDateTime horaIngreso = LocalDateTime.now();
+        this.ultimo_login = horaIngreso.format(format);
+
         this.id_rol = id_rol;
     }
 
@@ -25,8 +31,8 @@ public class Usuario {
         this.nombre_usuario = "";
         this.email = "";
         this.password = "";
-        this.ultimo_login = null;
-        this.id_rol = 3;
+        this.ultimo_login = "";
+        this.id_rol = null;
     }
 
 
@@ -62,19 +68,19 @@ public class Usuario {
         this.password = password;
     }
 
-    public Date getUltimo_login() {
+    public String getUltimo_login() {
         return ultimo_login;
     }
 
-    public void setUltimo_login(Date ultimo_login) {
+    public void setUltimo_login(String ultimo_login) {
         this.ultimo_login = ultimo_login;
     }
 
-    public int getId_rol() {
+    public Rol getId_rol() {
         return id_rol;
     }
 
-    public void setId_rol(int id_rol) {
+    public void setId_rol(Rol id_rol) {
         this.id_rol = id_rol;
     }
 

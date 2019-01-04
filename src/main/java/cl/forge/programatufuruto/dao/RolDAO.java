@@ -12,10 +12,13 @@ import java.util.ArrayList;
 
 public class RolDAO {
 
-    PreparedStatement psInsertar;
-    Statement statement;
-    Conexion conexion;
+    private PreparedStatement psInsertar;
+    private Statement statement;
+    private Conexion conexion;
 
+    public RolDAO(){
+        this.conexion = new Conexion();
+    }
     public ArrayList<Rol> obtenerRoles() throws SQLException {
 
        ArrayList<Rol> roles = new ArrayList<>();

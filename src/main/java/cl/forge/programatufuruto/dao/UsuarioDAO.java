@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,34 @@ public class UsuarioDAO {
     private PreparedStatement psInsertar;
     private Statement statement;
     private Conexion conexion;
+
+    public UsuarioDAO(){
+        this.conexion = new Conexion();
+    }
+
+    public PreparedStatement getPsInsertar() {
+        return psInsertar;
+    }
+
+    public void setPsInsertar(PreparedStatement psInsertar) {
+        this.psInsertar = psInsertar;
+    }
+
+    public Statement getStatement() {
+        return statement;
+    }
+
+    public void setStatement(Statement statement) {
+        this.statement = statement;
+    }
+
+    public Conexion getConexion(Conexion conexion) {
+        return this.conexion;
+    }
+
+    public void setConexion(Conexion conexion) {
+        this.conexion = conexion;
+    }
 
     public String encriptar(String cadena) throws NoSuchAlgorithmException{
 
@@ -40,56 +69,55 @@ public class UsuarioDAO {
 
     public boolean existeUsuario( Usuario usuario ) throws SQLException {
         //BUSQUEDA DE NOMBRE EN BASE DE DATOS
-        psInsertar = conexion.getConexion().prepareStatement("SELECT nombre_usuario FROM usuarios WHERE nombre_usuario = ?");
+        System.out.println("Error ");
+        psInsertar = conexion.getConexion().prepareStatement("SELECT nombre_usuario FROM usuarios WHERE nombre_usuario=?");
         psInsertar.setString(1, usuario.getNombre_usuario());
-        //psInsertar.setString(2, usuario.getEmail());
         ResultSet rs = psInsertar.executeQuery();
         return rs.next();
     }
 
     public boolean existeUsuarioPorEmail( Usuario usuario ) throws SQLException{
         //BUSQUEDA DE EMAIL EN BASE DE DATOS
-        psInsertar = conexion.getConexion().prepareStatement("SELECT email FROM usuarios WHERE email=?");
+        psInsertar = conexion.getConexion().prepareStatement("SELECT * FROM usuarios WHERE email=?");
         psInsertar.setString(1, usuario.getEmail());
         ResultSet rs = psInsertar.executeQuery();
         return rs.next();
     }
 
-    public void guardarUsuario(Usuario u) throws CorreoEnUsoException, UsuarioExistenteException, SQLException{
+    public void guardarUsuario(Usuario u) throws CorreoEnUsoException, UsuarioExistenteException, SQLException {
         try {
-            final String SQL = "INSERT INTO usuarios(id_usuario,nombre_usuario,email,password,ultimo_login,id_rol) VALUES (?,?,?,?,?,?)";
-            psInsertar = conexion.getConexion().prepareStatement(SQL);
-            psInsertar.setInt(1, u.getId_usuario());
-            psInsertar.setString(2, u.getNombre_usuario());
-            psInsertar.setString(3, u.getEmail());
+        //VERIFICAR SI NOMBRE EXISTE, SI NO, SETEARLO
+        if (existeUsuario(u)) {
+            throw new UsuarioExistenteException("Usuario ya existe");          //LLAMA AL METODO existeUsuario, que verifica en la DB si el nombre ya esta en uso.
+        } else if (existeUsuarioPorEmail(u)) {
+            throw new CorreoEnUsoException("Email ya utilizado");             //LLAMA AL METODO existeUsuariPorEmail, que verifica en la DB si el email ya esta en uso.
+        } else {
 
-            //VERIFICAR SI NOMBRE EXISTE, SI NO, SETEARLO
-            if (existeUsuario(u)) {
-                throw new UsuarioExistenteException("Usuario ya existe");          //LLAMA AL METODO existeUsuario, que verifica en la DB si el nombre ya esta en uso.
-            } else if (existeUsuarioPorEmail(u)) {
-                throw new CorreoEnUsoException("Email ya utilizado");             //LLAMA AL METODO existeUsuariPorEmail, que verifica en la DB si el email ya esta en uso.
-            } else {
 
+                final String SQL = "INSERT INTO usuarios(id_usuario,nombre_usuario,email,password,ultimo_login,id_rol) VALUES (?,?,?,?,?,?)";
+                psInsertar = conexion.getConexion().prepareStatement(SQL);
+                psInsertar.setInt(1, u.getId_usuario());
+                psInsertar.setString(2, u.getNombre_usuario());
+                psInsertar.setString(3, u.getEmail());
                 psInsertar.setString(4, encriptar(u.getPassword()));   //Se ingresa contraseña encriptada
-                psInsertar.setDate(5, new java.sql.Date(u.getUltimo_login().getTime()));    //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
-                psInsertar.setObject(6, u.getId_rol());
+                psInsertar.setString(5, u.getUltimo_login());    //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
+                psInsertar.setInt(6, u.getId_rol().getId_rol());
                 psInsertar.executeUpdate();
-            }
+        }
 
-        }catch(SQLException ex){
-                ex.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-
     }
-
 
     //ACTUALIZA FECHA EN LA BASE DE DATOS
     public void actualizarFecha(Usuario usuario) throws SQLException{
 
         psInsertar = conexion.getConexion().prepareStatement("UPDATE usuarios SET ultimo_login = ? WHERE nombre_usuario = ?");
-        psInsertar.setDate(1, new java.sql.Date( new Date().getTime() ));  //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
+        String horaActual = LocalDateTime.now().toString();
+        psInsertar.setString(1, horaActual);  //TRASPASA LA FECHA ACTUAL DEL SISTEMA, DE JAVA A SQL.
         psInsertar.setString(2,usuario.getNombre_usuario());
     }
 
@@ -103,9 +131,9 @@ public class UsuarioDAO {
             ResultSet rs = psInsertar.executeQuery();
 
             if(rs.next()){
-                usuario.setUltimo_login(new java.sql.Date(usuario.getUltimo_login().getTime()));
-                UsuarioDAO usuariodao = new UsuarioDAO();                       // ????????
-                usuariodao.actualizarFecha(usuario);                            //Cual de las dos lineas se utilizaria.
+                usuario.setUltimo_login(usuario.getUltimo_login());              //Actualiza el objeto Usuario
+                UsuarioDAO usuariodao = new UsuarioDAO();
+                usuariodao.actualizarFecha(usuario);                            //Actualiza la base de datos
             }else{
                 return false;
             }
@@ -132,8 +160,8 @@ public class UsuarioDAO {
             usuario.setNombre_usuario(rs.getString(2));
             usuario.setEmail(rs.getString(3));
             usuario.setPassword(rs.getString(4));
-            usuario.setUltimo_login(rs.getDate(5));
-            usuario.setId_rol(rs.getInt(6));
+            usuario.setUltimo_login(rs.getString(5));
+            usuario.setId_rol((Rol)rs.getObject(6));
             usuarios.add(usuario);
         }
         return usuarios;
@@ -152,8 +180,8 @@ public class UsuarioDAO {
             usuario.setNombre_usuario(rs.getString(2));
             usuario.setEmail(rs.getString(3));
             usuario.setPassword(rs.getString(4));
-            usuario.setUltimo_login(rs.getDate(5));
-            usuario.setId_rol(rs.getInt(6));
+            usuario.setUltimo_login(rs.getString(5));
+            usuario.setId_rol((Rol)rs.getObject(6));
         }
         return usuario;
     }
@@ -171,8 +199,8 @@ public class UsuarioDAO {
             usuario.setNombre_usuario(rs.getString(2));
             usuario.setEmail(rs.getString(3));
             usuario.setPassword(rs.getString(4));
-            usuario.setUltimo_login(rs.getDate(5));
-            usuario.setId_rol(rs.getInt(6));
+            usuario.setUltimo_login(rs.getString(5));
+            usuario.setId_rol((Rol)rs.getObject(6));
         }
         return usuario;
     }
